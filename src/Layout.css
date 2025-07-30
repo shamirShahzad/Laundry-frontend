@@ -1,0 +1,13 @@
+.register {
+  background-color: hsl(215.4 16.3% 46.9%);
+  &:hover {
+    background-color: hsl(215.3 25% 26.7%);
+  }
+}
+
+.login {
+  background-color: hsl(215.3 19.3% 34.5%);
+  &:hover {
+    background-color: hsl(215.3 25% 26.7%);
+  }
+}

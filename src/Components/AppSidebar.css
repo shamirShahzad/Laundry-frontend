@@ -1,0 +1,4 @@
+.button-straight {
+  border-radius: 0px !important;
+  border-left: 1px solid oklch(0.998, 0, 0);
+}

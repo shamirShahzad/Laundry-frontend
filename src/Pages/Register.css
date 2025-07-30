@@ -1,0 +1,19 @@
+.content {
+  height: 100vh;
+  background-image: url("../assets/background.png");
+  background-size: cover;
+}
+.shadow {
+  background-color: #d0dbe3;
+  box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
+}
+.image {
+  background-color: #f9fcfe;
+}
+
+.registerForm {
+  display: flex;
+  flex-direction: column;
+  gap: 4;
+  justify-content: space-between;
+}

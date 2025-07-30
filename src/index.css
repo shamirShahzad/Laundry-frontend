@@ -1,5 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+* {
+  font-family: "Raleway", sans-serif;
+  font-optical-sizing: auto;
+}
 
 @custom-variant dark (&:is(.dark *));
 @layer base {

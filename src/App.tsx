@@ -11,11 +11,11 @@ function App() {
     <>
       <Routes>
         <Route element={<AuthLayout />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Register />} />
+          <Route path="/" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Route>
         <Route element={<Layout />}>
-          <Route path="/home" element={<Home />} />
+          <Route path="/dashboard" element={<Home />} />
           <Route path="/about" element={<About />} />
         </Route>
       </Routes>

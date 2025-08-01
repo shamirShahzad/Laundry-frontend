@@ -41,7 +41,7 @@ const Login = () => {
     try {
       const response = await API.post("/users/login", formData);
       if (response.data.success === true) {
-        auth.login();
+        await auth.login();
         resetForm();
         navigate("/dashboard");
       }

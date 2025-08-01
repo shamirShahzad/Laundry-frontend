@@ -18,7 +18,7 @@ function App() {
           <Route path="/unauthorized" element={<Unauthorized />} />
         </Route>
         <Route element={<Layout />}>
-          <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
+          <Route element={<ProtectedRoutes />}>
             <Route path="/dashboard" element={<Home />} />
           </Route>
           <Route path="/about" element={<About />} />

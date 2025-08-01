@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { API } from "@/lib/utils/Axios";
 
 interface User {
@@ -27,7 +27,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const fetchUser = async () => {
     try {
       const res = await API.get("/users/me", { withCredentials: true });
-      console.log(res);
       if (res.data.success) {
         setUser(res.data.data);
       }
@@ -46,6 +45,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
     document.cookie = "token=; Max-Age=0; path=/";
   };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout }}>

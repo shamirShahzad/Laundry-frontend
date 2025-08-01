@@ -1,6 +1,6 @@
 const Unauthorized = () => {
   return (
-    <div className="flex justify-center items-cente">
+    <div className="flex justify-center items-center">
       <img src="/unauthorized.webp" alt="Unauthorized" />
     </div>
   );

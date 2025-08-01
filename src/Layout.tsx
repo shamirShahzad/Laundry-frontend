@@ -1,14 +1,23 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { AppSidebar } from "./Components/AppSidebar";
 import BreadCrumbs from "./Components/BreadCrumbs";
-// import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar";
 import "./Layout.css";
-// import { useLocation, useNavigate } from "react-router-dom";
+import { Button } from "./components/ui/button";
+import { API } from "./lib/utils/Axios";
+import { useAuth } from "./context/AuthContext";
 
 export default function Layout() {
-  // const navigate = useNavigate();
-  // const location = useLocation();
+  const auth = useAuth();
+  const navigate = useNavigate();
+  const handleLogut = async () => {
+    const res = await API.post("/users/logout");
+    if (res.data.success) {
+      auth.logout();
+      navigate("/");
+    }
+  };
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -16,22 +25,11 @@ export default function Layout() {
         <div className="flex items-center justify-center w-full h-12 border-b">
           <SidebarTrigger />
           <BreadCrumbs />
-          {/* <div className="flex gap-2 mr-3">
-            {location.pathname === "/register" ? null : (
-              <Button
-                variant="default"
-                className="register"
-                onClick={() => {
-                  navigate("/register");
-                }}
-              >
-                Register
-              </Button>
-            )}
-            <Button variant="default" className="login ">
-              Login
+          <div className="flex gap-2 mr-5">
+            <Button variant="default" className="login" onClick={handleLogut}>
+              Logout
             </Button>
-          </div> */}
+          </div>
         </div>
         <Outlet />
       </main>

@@ -7,15 +7,17 @@ import { AlertCircleIcon, Loader2Icon, Lock, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useState } from "react";
-import { API } from "@/lib/Axios";
+import { API } from "@/lib/utils/Axios";
 import type { AxiosError } from "axios";
-import type { ErrorResponse } from "@/lib/Constants";
+import type { ErrorResponse } from "@/lib/utils/Constants";
+import { useAuth } from "@/context/AuthContext";
 const Login = () => {
   interface LoginFormData {
     email: string;
     password: string;
   }
   const navigate = useNavigate();
+  const auth = useAuth();
   const [loading, setLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -39,7 +41,7 @@ const Login = () => {
     try {
       const response = await API.post("/users/login", formData);
       if (response.data.success === true) {
-        setLoading(false);
+        auth.login();
         resetForm();
         navigate("/dashboard");
       }
@@ -48,6 +50,8 @@ const Login = () => {
       const errorData = err?.response?.data as ErrorResponse;
       setIsError(true);
       setErrorMessage(errorData?.message || "Something went wrong");
+      setLoading(false);
+    } finally {
       setLoading(false);
     }
   };

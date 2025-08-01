@@ -1,7 +1,7 @@
 import { Formik, Form } from "formik";
 import { Link, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import { API } from "@/lib/Axios";
+import { API } from "@/lib/utils/Axios";
 import Sham_Input from "@/Components/Sham_Input";
 import "./Register.css";
 import {
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { AxiosError } from "axios";
-import type { ErrorResponse } from "@/lib/Constants";
+import type { ErrorResponse } from "@/lib/utils/Constants";
 const Register = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);

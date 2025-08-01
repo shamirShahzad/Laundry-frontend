@@ -21,14 +21,9 @@ const BreadCrumbs = () => {
   return (
     <Breadcrumb className="w-full ml-2">
       <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink asChild>
-            <Link to="/">Home</Link>
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        {breadCrumbs.map((crumb) => (
+        {breadCrumbs.map((crumb, index) => (
           <div key={crumb.href} className="flex items-center">
-            <BreadcrumbSeparator />
+            {index !== 0 && <BreadcrumbSeparator />}
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
                 <Link to={crumb.href}>{crumb.label}</Link>

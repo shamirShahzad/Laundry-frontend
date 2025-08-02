@@ -1,5 +1,12 @@
 import "./AppSidebar.css";
-import { Calendar, Home, Search, Settings, InfoIcon } from "lucide-react";
+import {
+  Calendar,
+  Home,
+  Search,
+  Settings,
+  UserRoundPlus,
+  UserRound,
+} from "lucide-react";
 // import useSidebar from "@/components/ui/sidebar";
 import {
   Sidebar,
@@ -8,41 +15,47 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import NonCollapsibleItem from "./NonCollapsibleItem";
+import CollapsibleItems from "./CollapsibleItems";
+import { useLocation } from "react-router-dom";
 
 // Menu items.
 const items = [
   {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: Home,
-  },
-  {
-    title: "About",
-    url: "/about",
-    icon: InfoIcon,
+    title: "Customers",
+    url: "/customers",
+    Icon: UserRound,
+    items: [
+      {
+        title: "Add customers",
+        url: "/customers/add",
+        Icon: UserRoundPlus,
+      },
+    ],
   },
   {
     title: "Calendar",
-    url: "#",
-    icon: Calendar,
+    url: "/calendar",
+    Icon: Calendar,
+    items: [],
   },
   {
     title: "Search",
     url: "#",
-    icon: Search,
+    Icon: Search,
+    items: [],
   },
   {
     title: "Settings",
     url: "#",
-    icon: Settings,
+    Icon: Settings,
+    items: [],
   },
 ];
 
 export function AppSidebar() {
-  //   const { open } = useSidebar();
+  const location = useLocation();
   return (
     <Sidebar>
       <SidebarContent>
@@ -50,16 +63,16 @@ export function AppSidebar() {
           <SidebarGroupLabel>Laundry</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              <NonCollapsibleItem
+                title="Dashboard"
+                url="/dashboard"
+                Icon={Home}
+                locationPath={location.pathname}
+              />
+              <CollapsibleItems
+                items={items}
+                locationPath={location.pathname}
+              />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

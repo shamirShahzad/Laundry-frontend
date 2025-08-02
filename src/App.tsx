@@ -1,6 +1,6 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
-import Home from "./Pages/Home";
+import Dashboard from "./Pages/Dashboard";
 import About from "./Pages/About";
 import Register from "./Pages/Register";
 import AuthLayout from "./AuthLayout";
@@ -8,6 +8,8 @@ import Login from "./Pages/Login";
 import Layout from "./Layout";
 import Unauthorized from "./Pages/Unauthorized";
 import ProtectedRoutes from "./Components/ProtectedRoutes";
+import Customers from "./Pages/Customers";
+import AddCustomer from "./Pages/AddCustomer";
 function App() {
   return (
     <>
@@ -19,7 +21,10 @@ function App() {
         </Route>
         <Route element={<Layout />}>
           <Route element={<ProtectedRoutes />}>
-            <Route path="/dashboard" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            //Customers routes
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/customers/add" element={<AddCustomer />} />
           </Route>
           <Route path="/about" element={<About />} />
         </Route>

@@ -94,6 +94,7 @@ const Login = () => {
                 placeholder="Password"
                 type="password"
                 name="password"
+                isPassword={true}
                 Icon={Lock}
                 onChange={handleChange}
                 onBlur={handleBlur}

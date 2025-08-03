@@ -73,11 +73,10 @@ const Sham_Input = ({
             <></>
           )}
         </div>
+        {meta.touched && meta.error && (
+          <div className="text-red-600 text-xs mb-1">{meta.error}</div>
+        )}
       </div>
-
-      {meta.touched && meta.error && (
-        <div className="text-red-600 text-xs mb-1">{meta.error}</div>
-      )}
     </>
   );
 };

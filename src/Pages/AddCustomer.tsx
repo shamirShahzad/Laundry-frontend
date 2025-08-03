@@ -29,7 +29,11 @@ const AddCustomer = () => {
   };
 
   return (
-    <div className="w-full h-full bg-cyan-100">
+    <div className="w-full h-full bg-gray-200">
+      <div className="ml-9">
+        <h1 className="mt-6 text-2xl font-semibold">Add customer</h1>
+      </div>
+      <hr className="border-b border-gray-400 mt-3" />
       <Formik
         initialValues={initialValues}
         validationSchema={addCustomerSchema}
@@ -38,7 +42,7 @@ const AddCustomer = () => {
         }}
       >
         {({ handleChange, handleBlur, values }) => (
-          <Form className="mt-1 p-6 gap-4 ">
+          <Form className="mt-1 p-6 gap-4 flex ml-3">
             <Sham_Input
               placeholder="Name"
               type="text"
@@ -46,7 +50,9 @@ const AddCustomer = () => {
               onChange={handleChange}
               onBlur={handleBlur}
               value={values.name}
-              divClassName="border-1 border-gray-100 "
+              divClassName="border-1 border-gray-400 "
+              Label="Name"
+              LabelImportant={true}
             />
             <Sham_Input
               placeholder="Email"
@@ -55,13 +61,20 @@ const AddCustomer = () => {
               onChange={handleChange}
               onBlur={handleBlur}
               value={values.email}
+              divClassName="border-1 border-gray-400 "
+              Label="E-mail"
             />
-            <Button
-              type="submit"
-              className="w-full text-1xl font-bold uppercase bg-cyan-950"
-            >
-              Add Customer
-            </Button>
+            <Sham_Input
+              placeholder="Phone"
+              type="phone"
+              name="phone"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.phone}
+              divClassName="border-1 border-gray-400 w-fit"
+              Label="Phone"
+              LabelImportant={true}
+            />
           </Form>
         )}
       </Formik>

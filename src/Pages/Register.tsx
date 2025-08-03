@@ -123,6 +123,7 @@ const Register = () => {
                 onBlur={handleBlur}
                 value={values.password}
                 isPassword={true}
+                divClassName="w-full important"
               />
               <Sham_Input
                 placeholder="Phone"

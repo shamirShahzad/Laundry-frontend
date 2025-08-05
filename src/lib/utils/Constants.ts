@@ -7,3 +7,10 @@ export interface ErrorResponse {
   stack: unknown;
   data: object;
 }
+
+export interface SuccessResponse {
+  success: boolean;
+  statusCode: string;
+  message: string;
+  data: object;
+}

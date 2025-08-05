@@ -1,3 +1,10 @@
 .text-dark-blue {
   color: #2a4352;
 }
+
+.button-bg-dark-blue {
+  background-color: hsl(215, 23%, 31%);
+  &:hover {
+    background-color: hsl(215.3 25% 26.7%);
+  }
+}

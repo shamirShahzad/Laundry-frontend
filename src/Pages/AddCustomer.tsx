@@ -1,21 +1,29 @@
 import Sham_Input from "@/Components/Sham_Input";
 import { Button } from "@/components/ui/button";
 import { Form, Formik } from "formik";
-import { MailIcon, Phone, User } from "lucide-react";
+import { Building, MailIcon, MapPin, Phone, User } from "lucide-react";
 import * as Yup from "yup";
 import "./colors.css";
 import Sham_Select from "@/Components/Sham_Select";
-import { Country, State, City } from "country-state-city";
-import { useState } from "react";
+import {
+  Country,
+  State,
+  City,
+  type ICountry,
+  type IState,
+  type ICity,
+} from "country-state-city";
+import React, { useEffect, useState } from "react";
 interface AddCustomerFormData {
   name: string;
   email: string;
   phone: string;
   address: {
+    country: string;
+    state: string;
     city: string;
     street: string;
     building: string;
-    country: string;
   };
 }
 const AddCustomer = () => {
@@ -32,22 +40,30 @@ const AddCustomer = () => {
     },
   };
 
+  const [countries, setCountries] = useState([] as Array<ICountry>);
+  const [states, setStates] = useState([] as Array<IState>);
+  const [cities, setCities] = useState([] as Array<ICity>);
+
   const addCustomerSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
     email: Yup.string().email("Invalid email").nullable(),
     phone: Yup.string().required("Phone is required").nonNullable(),
     address: Yup.object().shape({
-      // city: Yup.string().required("City is required"),
-      // street: Yup.string().required("Street is required"),
-      // building: Yup.string().required("Building is required"),
-      state: Yup.string().required("State is required"),
-      country: Yup.string().required("Country is required"),
+      country: Yup.string(),
+      state: Yup.string(),
+      city: Yup.string(),
+      street: Yup.string(),
+      building: Yup.string(),
     }),
   });
 
   const handleSubmit = (formData: AddCustomerFormData) => {
     console.log(formData);
   };
+
+  useEffect(() => {
+    setCountries(Country.getAllCountries());
+  }, []);
 
   return (
     <div className="w-full h-full bg-gray-200">
@@ -65,72 +81,136 @@ const AddCustomer = () => {
           resetForm();
         }}
       >
-        {({ handleChange, handleBlur, values }) => (
-          <Form>
-            <div className="mt-1 p-6 flex ml-3 gap-24">
-              <Sham_Input
-                placeholder="Name"
-                type="text"
-                name="name"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                value={values.name}
-                divClassName="border-1 border-gray-400 "
-                Icon={User}
-                Label="Name"
-                LabelImportant={true}
-              />
-              <Sham_Input
-                placeholder="Email"
-                type="email"
-                name="email"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                Icon={MailIcon}
-                value={values.email}
-                divClassName="border-1 border-gray-400 "
-                Label="E-mail"
-              />
-              <Sham_Input
-                placeholder="Phone"
-                type="phone"
-                name="phone"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                value={values.phone}
-                Icon={Phone}
-                divClassName="border-1 border-gray-400"
-                Label="Phone"
-                LabelImportant={true}
-              />
-            </div>
-            <h1 className="text-xl font-semibold ml-9 text-dark-blue">
-              Address
-            </h1>
-            <hr className="border-t border-gray-400" />
-            <div className="mt-1 p-6 flex ml-3 gap-24">
-              <Sham_Select
-                data={Country.getAllCountries()}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                name="address.country"
-                value={values.address.country}
-                Label={"Country"}
-                LabelImportant={true}
-              />
-              <Sham_Select
-                data={Country.getAllCountries()}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                name="address.state"
-                value={values.address.state}
-                Label={"State"}
-                LabelImportant={true}
-              />
-            </div>
-            <Button type="submit">Add customer</Button>
-          </Form>
-        )}
+        {({ handleChange, handleBlur, values }) => {
+          const customHandleChange = (
+            e: React.ChangeEvent<HTMLSelectElement>
+          ) => {
+            console.log(e.target);
+            const { name } = e.target;
+            if (name === "address.country") {
+              const country = countries.find(
+                (c) => c.name === e.target.value
+              ) as ICountry;
+              const getStates = State.getStatesOfCountry(country.isoCode);
+              if (getStates.length <= 0) {
+                console.log("CITY", City.getCitiesOfCountry(country.isoCode));
+                setCities(City.getCitiesOfCountry(country.isoCode));
+              }
+              setStates(getStates);
+            } else if (name === "address.state") {
+              const state = states.find(
+                (s) => s.name === e.target.value
+              ) as IState;
+              setCities(
+                City.getCitiesOfState(state.countryCode, state.isoCode)
+              );
+            }
+            handleChange(e);
+          };
+          return (
+            <Form>
+              <div className="mt-1 p-6 flex ml-3 gap-24">
+                <Sham_Input
+                  placeholder="Name"
+                  type="text"
+                  name="name"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.name}
+                  divClassName="border-1 border-gray-400 "
+                  Icon={User}
+                  Label="Name"
+                  LabelImportant={true}
+                />
+                <Sham_Input
+                  placeholder="Email"
+                  type="email"
+                  name="email"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  Icon={MailIcon}
+                  value={values.email}
+                  divClassName="border-1 border-gray-400 "
+                  Label="E-mail"
+                />
+                <Sham_Input
+                  placeholder="Phone"
+                  type="phone"
+                  name="phone"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.phone}
+                  Icon={Phone}
+                  divClassName="border-1 border-gray-400"
+                  Label="Phone"
+                  LabelImportant={true}
+                />
+              </div>
+              <h1 className="text-xl font-semibold ml-9 text-dark-blue">
+                Address
+              </h1>
+              <hr className="border-t border-gray-400" />
+              <div className="mt-1 p-6 flex ml-3 gap-24">
+                <Sham_Select
+                  data={countries}
+                  onChange={customHandleChange}
+                  onBlur={handleBlur}
+                  name="address.country"
+                  value={values.address.country}
+                  Label={"Country"}
+                />
+                <Sham_Select
+                  data={states}
+                  onChange={customHandleChange}
+                  onBlur={handleBlur}
+                  name="address.state"
+                  value={values.address.state}
+                  Label={"State"}
+                  disabled={states.length === 0}
+                />
+                <Sham_Select
+                  data={cities}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  name="address.city"
+                  value={values.address.city}
+                  Label={"City"}
+                  disabled={cities.length === 0}
+                />
+              </div>
+              <div className="px-6 flex ml-3 gap-24">
+                <Sham_Input
+                  placeholder="Street"
+                  type="text"
+                  name="address.street"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.address.street}
+                  Icon={MapPin}
+                  divClassName="border-1 border-gray-400"
+                  Label="Street"
+                />
+
+                <Sham_Input
+                  placeholder="Building"
+                  type="text"
+                  name="address.building"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.address.building}
+                  Icon={Building}
+                  divClassName="border-1 border-gray-400"
+                  Label="Street"
+                />
+              </div>
+              <div className="px-6 flex ml-3 gap-24 mt-3 ">
+                <Button type="submit" className="button-bg-dark-blue">
+                  Add customer
+                </Button>
+              </div>
+            </Form>
+          );
+        }}
       </Formik>
     </div>
   );

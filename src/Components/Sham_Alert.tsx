@@ -38,7 +38,7 @@ const Sham_Alert = ({
   if (!visible) return null;
 
   return (
-    <div className="absolute bottom-4 right-4">
+    <div className="absolute bottom-4 right-4 z-50">
       <div
         className={`relative  opacity-100 p-3 mt-2 mx-4 rounded-md border-1 ${
           type === "error"

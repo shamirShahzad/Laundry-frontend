@@ -21,7 +21,7 @@ export default function Layout() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="w-full flex flex-col min-h-screen">
+      <main className="w-full flex flex-col max-h-screen">
         <div className="flex items-center justify-center w-full h-12 border-b">
           <SidebarTrigger />
           <BreadCrumbs />

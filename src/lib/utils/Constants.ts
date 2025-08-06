@@ -8,9 +8,9 @@ export interface ErrorResponse {
   data: object;
 }
 
-export interface SuccessResponse {
+export interface SuccessResponse<T = object> {
   success: boolean;
   statusCode: string;
   message: string;
-  data: object;
+  data: T;
 }

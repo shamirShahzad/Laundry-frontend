@@ -30,7 +30,11 @@ const Sham_Input = ({
     <>
       <div className="flex-col justify-start">
         {Label && (
-          <div className="flex items-center gap-1 min-h-[32px]">
+          <div
+            className={`flex items-center gap-1 min-h-[32px] ${
+              props.disabled && "opacity-50"
+            }`}
+          >
             <label htmlFor={name}>{Label} </label>
             {LabelImportant ? (
               <span className="text-red-600 text-3xl border-box leading-none">

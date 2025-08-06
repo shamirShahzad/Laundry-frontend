@@ -26,7 +26,11 @@ const BreadCrumbs = () => {
             {index !== 0 && <BreadcrumbSeparator />}
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to={crumb.href}>{crumb.label}</Link>
+                <Link to={crumb.href}>
+                  {!Number.isNaN(parseInt(crumb.label))
+                    ? "Details"
+                    : crumb.label}
+                </Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
           </div>

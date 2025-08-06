@@ -8,3 +8,19 @@
     background-color: hsl(215.3 25% 26.7%);
   }
 }
+
+.button-background-destructive {
+  background-color: transparent;
+  color: black;
+  &:hover {
+    background-color: var(--color-red-500);
+  }
+}
+
+.button-background-warning {
+  background-color: transparent;
+  color: black;
+  &:hover {
+    background-color: var(--color-yellow-300);
+  }
+}

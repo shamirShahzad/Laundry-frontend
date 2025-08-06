@@ -10,6 +10,7 @@ import Unauthorized from "./Pages/Unauthorized";
 import ProtectedRoutes from "./Components/ProtectedRoutes";
 import Customers from "./Pages/Customers";
 import AddCustomer from "./Pages/AddCustomer";
+import CustomerDetails from "./Pages/CustomerDetails";
 function App() {
   return (
     <>
@@ -25,6 +26,7 @@ function App() {
             //Customers routes
             <Route path="/customers" element={<Customers />} />
             <Route path="/customers/add" element={<AddCustomer />} />
+            <Route path="/customers/:id" element={<CustomerDetails />} />
           </Route>
           <Route path="/about" element={<About />} />
         </Route>

@@ -1,15 +1,7 @@
 import Sham_Input from "@/Components/Sham_Input";
 import { Button } from "@/components/ui/button";
 import { Form, Formik } from "formik";
-import {
-  AlertCircleIcon,
-  Building,
-  CheckCircle2Icon,
-  MailIcon,
-  MapPin,
-  Phone,
-  User,
-} from "lucide-react";
+import { Building, MailIcon, MapPin, Phone, User } from "lucide-react";
 import { API } from "@/lib/utils/Axios";
 import * as Yup from "yup";
 import "./colors.css";
@@ -24,9 +16,10 @@ import {
 } from "country-state-city";
 import React, { useEffect, useState } from "react";
 import type { AxiosError } from "axios";
-import type { ErrorResponse, SuccessResponse } from "@/lib/utils/Constants";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import type { ErrorResponse } from "@/lib/utils/Constants";
 import Sham_LoadingOverlay from "@/Components/Sham_LoadingOverlay";
+import { useAlert } from "@/hooks/useAlert";
+import Sham_Alert from "@/Components/Sham_Alert";
 interface AddCustomerFormData {
   name: string;
   email: string;
@@ -57,10 +50,7 @@ const AddCustomer = () => {
   const [states, setStates] = useState([] as Array<IState>);
   const [cities, setCities] = useState([] as Array<ICity>);
   const [loading, setLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState("");
-  const [customer, setCustomer] = useState({} as SuccessResponse);
+  const { alert, showAlert, hideAlert } = useAlert();
 
   const addCustomerSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
@@ -79,26 +69,24 @@ const AddCustomer = () => {
     formData: AddCustomerFormData,
     resetForm: () => void
   ) => {
-    setIsError(false);
-    setIsSuccess(false);
     try {
       const response = await API.post("/customers/create", formData, {
         withCredentials: true,
       });
       if (response.data.success) {
         setLoading(true);
-        setTimeout(() => setLoading(false), 100);
-        setCustomer(response.data);
-        setIsSuccess(true);
+        showAlert("success", response.data.message);
         resetForm();
       }
     } catch (error) {
       const err = error as AxiosError;
       const errData = err?.response?.data as ErrorResponse;
-      setIsError(true);
-      setError(errData?.message || "Something Went Wrong");
+      showAlert(
+        "error",
+        errData?.message || err?.message || "Something went wrong"
+      );
     } finally {
-      //setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -109,23 +97,12 @@ const AddCustomer = () => {
   return (
     <Sham_LoadingOverlay loading={loading}>
       <div className="w-full h-full bg-gray-200">
-        {(isError || isSuccess) && (
-          <Alert
-            variant={isError ? "destructive" : "default"}
-            className={`p-1 align-middle mr-5 ml-2  mt-2 w-auto ${
-              isError && "border-red-300 text-red-800 bg-red-100"
-            } ${isSuccess && "border-green-300 text-green-800 bg-green-100"}`}
-          >
-            {isError ? <AlertCircleIcon /> : <CheckCircle2Icon />}
-            <AlertDescription>
-              {isError
-                ? error || "Something went wrong"
-                : isSuccess
-                ? customer?.message
-                : ""}
-            </AlertDescription>
-          </Alert>
-        )}
+        <Sham_Alert
+          type={alert.type}
+          message={alert.message}
+          onClose={hideAlert}
+          visible={alert.visible}
+        />
         <div className="ml-9">
           <h1 className="mt-6 text-2xl font-semibold text-dark-blue">
             Add customer

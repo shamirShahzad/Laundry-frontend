@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import "./dataTable.css";
 import { DataTablePagination } from "./DataTablePagination";
 import { Input } from "@/components/ui/input";
@@ -36,8 +36,6 @@ export function DataTable<TData, TValue>({
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [scrolled, setScrolled] = useState(false);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const table = useReactTable({
     data,
     columns,
@@ -55,20 +53,6 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = scrollContainerRef.current?.scrollTop ?? 0;
-      setScrolled(scrollTop > 0);
-    };
-
-    const container = scrollContainerRef.current;
-    container?.addEventListener("scroll", handleScroll);
-
-    return () => {
-      container?.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
     <div>
       <div className="flex items-center py-4 ml-2">
@@ -81,12 +65,10 @@ export function DataTable<TData, TValue>({
           className="max-w-sm"
         />
       </div>
-      <div className="overflow-hidden border-t-0" ref={scrollContainerRef}>
+      <div className="overflow-hidden border-t-0">
         <Table containerClassName="myTable">
           <TableHeader
-            className={`sticky top-0 z-10 bg-white transition-shadow duration-300 ${
-              scrolled ? "boxShadow" : ""
-            }`}
+            className={`sticky top-0 z-10 bg-white transition-shadow duration-300 boxShadow `}
           >
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

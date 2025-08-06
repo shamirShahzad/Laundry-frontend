@@ -120,8 +120,13 @@ const CustomerDetails = () => {
 
   useEffect(() => {
     setCountries(Country.getAllCountries());
-    getCustomer();
   }, []);
+
+  useEffect(() => {
+    if (countries.length > 0) {
+      getCustomer();
+    }
+  }, [countries]);
 
   return (
     <Sham_LoadingOverlay loading={loading}>

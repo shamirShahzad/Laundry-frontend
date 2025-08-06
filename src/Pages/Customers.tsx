@@ -43,7 +43,7 @@ const Customers = () => {
 
   return (
     <Sham_LoadingOverlay loading={loading}>
-      <div className="">
+      <div>
         <Sham_Alert
           type={alert.type}
           message={alert.message}

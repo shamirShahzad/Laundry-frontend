@@ -9,8 +9,11 @@ import Layout from "./Layout";
 import Unauthorized from "./Pages/Unauthorized";
 import ProtectedRoutes from "./Components/ProtectedRoutes";
 import Customers from "./Pages/Customers";
+import Items from "./Pages/Items";
 import AddCustomer from "./Pages/AddCustomer";
 import CustomerDetails from "./Pages/CustomerDetails";
+import EditCustomer from "./Pages/EditCustomer";
+import AddItems from "./Pages/AddItems";
 function App() {
   return (
     <>
@@ -27,6 +30,9 @@ function App() {
             <Route path="/customers" element={<Customers />} />
             <Route path="/customers/add" element={<AddCustomer />} />
             <Route path="/customers/:id" element={<CustomerDetails />} />
+            <Route path="/customers/edit/:id" element={<EditCustomer />} />
+            <Route path="/items" element={<Items />} />
+            <Route path="/items/add" element={<AddItems />} />
           </Route>
           <Route path="/about" element={<About />} />
         </Route>

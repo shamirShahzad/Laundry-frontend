@@ -1,11 +1,12 @@
 import "./AppSidebar.css";
 import {
-  Calendar,
   Home,
   Search,
   Settings,
   UserRoundPlus,
   UserRound,
+  ClipboardPlusIcon,
+  ClipboardIcon,
 } from "lucide-react";
 // import useSidebar from "@/components/ui/sidebar";
 import {
@@ -35,10 +36,16 @@ const items = [
     ],
   },
   {
-    title: "Calendar",
-    url: "/calendar",
-    Icon: Calendar,
-    items: [],
+    title: "Items",
+    url: "/items",
+    Icon: ClipboardIcon,
+    items: [
+      {
+        title: "Add items",
+        url: "/items/add",
+        Icon: ClipboardPlusIcon,
+      },
+    ],
   },
   {
     title: "Search",

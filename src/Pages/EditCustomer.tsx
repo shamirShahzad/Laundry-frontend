@@ -15,16 +15,14 @@ import {
   type IState,
   type ICity,
 } from "country-state-city";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { AxiosError } from "axios";
 import type { ErrorResponse, SuccessResponse } from "@/lib/utils/Constants";
 import Sham_LoadingOverlay from "@/Components/Sham_LoadingOverlay";
-import { useParams } from "react-router-dom";
 import { useAlert } from "@/hooks/useAlert";
 import Sham_Alert from "@/Components/Sham_Alert";
-import { useAuth } from "@/context/AuthContext";
-import { useNavigate } from "react-router-dom";
-interface AddCustomerFormData {
+import { useParams } from "react-router-dom";
+interface EditCustomerFormData {
   name: string;
   email: string;
   phone: string;
@@ -36,7 +34,7 @@ interface AddCustomerFormData {
     building: string;
   };
 }
-const CustomerDetails = () => {
+const EditCustomer = () => {
   const initialValues = {
     name: "",
     email: "",
@@ -54,9 +52,8 @@ const CustomerDetails = () => {
   const [states, setStates] = useState([] as Array<IState>);
   const [cities, setCities] = useState([] as Array<ICity>);
   const [loading, setLoading] = useState(false);
-  const { alert, showAlert, hideAlert } = useAlert();
   const [customer, setCustomer] = useState<
-    SuccessResponse<AddCustomerFormData>
+    SuccessResponse<EditCustomerFormData>
   >({
     success: false,
     statusCode: "404",
@@ -64,8 +61,7 @@ const CustomerDetails = () => {
     data: initialValues,
   });
   const { id } = useParams();
-  const { user } = useAuth();
-  const navigate = useNavigate();
+  const { alert, showAlert, hideAlert } = useAlert();
 
   const addCustomerSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
@@ -80,6 +76,28 @@ const CustomerDetails = () => {
     }),
   });
 
+  const handleSubmit = async (formData: EditCustomerFormData) => {
+    try {
+      const response = await API.post(`/customers/update/${id}`, formData, {
+        withCredentials: true,
+      });
+      if (response.data.success) {
+        setLoading(true);
+        showAlert("success", response.data.message);
+        await getCustomer();
+      }
+    } catch (error) {
+      const err = error as AxiosError;
+      const errData = err?.response?.data as ErrorResponse;
+      showAlert(
+        "error",
+        errData?.message || err?.message || "Something went wrong"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getCustomer = async () => {
     setLoading(true);
     try {
@@ -87,7 +105,7 @@ const CustomerDetails = () => {
         withCredentials: true,
       });
       if (response.data.success) {
-        const retreivedCustomer: SuccessResponse<AddCustomerFormData> =
+        const retreivedCustomer: SuccessResponse<EditCustomerFormData> =
           response.data;
         showAlert("success", response.data.message);
         setCustomer(retreivedCustomer);
@@ -106,7 +124,7 @@ const CustomerDetails = () => {
 
   const setStateAndCity = (
     selectedCountry: ICountry | undefined,
-    retreivedCustomer: SuccessResponse<AddCustomerFormData>
+    retreivedCustomer: SuccessResponse<EditCustomerFormData>
   ) => {
     if (selectedCountry === undefined) return;
     const myStates = State.getStatesOfCountry(selectedCountry?.isoCode);
@@ -127,6 +145,12 @@ const CustomerDetails = () => {
   };
 
   useEffect(() => {
+    if (countries.length > 0) {
+      getCustomer();
+    }
+  }, [countries]);
+
+  useEffect(() => {
     setCountries(Country.getAllCountries());
   }, []);
 
@@ -140,48 +164,54 @@ const CustomerDetails = () => {
     }
   }, [customer]);
 
-  useEffect(() => {
-    if (countries.length > 0) {
-      getCustomer();
-    }
-  }, [countries]);
-
   return (
     <Sham_LoadingOverlay loading={loading}>
       <div className="w-full h-full bg-gray-200">
         <Sham_Alert
           type={alert.type}
           message={alert.message}
-          visible={alert.visible}
           onClose={hideAlert}
+          visible={alert.visible}
         />
-        <div className=" flex items-center justify-between ml-9">
+        <div className="ml-9">
           <h1 className="mt-6 text-2xl font-semibold text-dark-blue">
-            Customer Details
+            Edit customer
           </h1>
-          {user?.role === "admin" && (
-            <div className="flex gap-3 items-center mr-5 mt-6">
-              <Button
-                variant={"ghost"}
-                className="border-1 border-gray-400 button-background-warning"
-                onClick={() => navigate(`/customers/edit/${id}`)}
-              >
-                Edit
-              </Button>
-              <Button className="border-1 border-gray-400 button-background-destructive ">
-                Delete
-              </Button>
-            </div>
-          )}
         </div>
         <hr className="border-t border-gray-400 mt-3" />
         <Formik
           initialValues={customer.data}
           validationSchema={addCustomerSchema}
-          onSubmit={() => {}}
-          enableReinitialize
+          onSubmit={(values) => {
+            handleSubmit(values);
+          }}
         >
           {({ handleChange, handleBlur, values }) => {
+            const customHandleChange = (
+              e: React.ChangeEvent<HTMLSelectElement>
+            ) => {
+              console.log(e.target);
+              const { name } = e.target;
+              if (name === "address.country") {
+                const country = countries.find(
+                  (c) => c.name === e.target.value
+                ) as ICountry;
+                const getStates = State.getStatesOfCountry(country.isoCode);
+                if (getStates.length <= 0) {
+                  console.log("CITY", City.getCitiesOfCountry(country.isoCode));
+                  setCities(City.getCitiesOfCountry(country.isoCode));
+                }
+                setStates(getStates);
+              } else if (name === "address.state") {
+                const state = states.find(
+                  (s) => s.name === e.target.value
+                ) as IState;
+                setCities(
+                  City.getCitiesOfState(state.countryCode, state.isoCode)
+                );
+              }
+              handleChange(e);
+            };
             return (
               <Form>
                 <div className="mt-1 p-6 flex ml-3 gap-24">
@@ -196,7 +226,6 @@ const CustomerDetails = () => {
                     Icon={User}
                     Label="Name"
                     LabelImportant={true}
-                    disabled={true}
                   />
                   <Sham_Input
                     placeholder="Email"
@@ -208,7 +237,6 @@ const CustomerDetails = () => {
                     value={values.email}
                     divClassName="border-1 border-gray-400 "
                     Label="E-mail"
-                    disabled={true}
                   />
                   <Sham_Input
                     placeholder="Phone"
@@ -221,7 +249,6 @@ const CustomerDetails = () => {
                     divClassName="border-1 border-gray-400"
                     Label="Phone"
                     LabelImportant={true}
-                    disabled={true}
                   />
                 </div>
                 <h1 className="text-xl font-semibold ml-9 text-dark-blue">
@@ -231,21 +258,20 @@ const CustomerDetails = () => {
                 <div className="mt-1 p-6 flex ml-3 gap-24">
                   <Sham_Select
                     data={countries}
-                    onChange={handleChange}
+                    onChange={customHandleChange}
                     onBlur={handleBlur}
                     name="address.country"
                     value={values.address.country}
                     Label={"Country"}
-                    disabled={true}
                   />
                   <Sham_Select
                     data={states}
-                    onChange={handleChange}
+                    onChange={customHandleChange}
                     onBlur={handleBlur}
                     name="address.state"
                     value={values.address.state}
                     Label={"State"}
-                    disabled={true}
+                    disabled={states.length === 0}
                   />
                   <Sham_Select
                     data={cities}
@@ -254,7 +280,7 @@ const CustomerDetails = () => {
                     name="address.city"
                     value={values.address.city}
                     Label={"City"}
-                    disabled={true}
+                    disabled={cities.length === 0}
                   />
                 </div>
                 <div className="px-6 flex ml-3 gap-24">
@@ -268,7 +294,6 @@ const CustomerDetails = () => {
                     Icon={MapPin}
                     divClassName="border-1 border-gray-400"
                     Label="Street"
-                    disabled={true}
                   />
 
                   <Sham_Input
@@ -281,8 +306,12 @@ const CustomerDetails = () => {
                     Icon={Building}
                     divClassName="border-1 border-gray-400"
                     Label="Street"
-                    disabled={true}
                   />
+                </div>
+                <div className="px-6 flex ml-3 gap-24 mt-3 ">
+                  <Button type="submit" className="button-bg-dark-blue">
+                    Submit
+                  </Button>
                 </div>
               </Form>
             );
@@ -293,4 +322,4 @@ const CustomerDetails = () => {
   );
 };
 
-export default CustomerDetails;
+export default EditCustomer;

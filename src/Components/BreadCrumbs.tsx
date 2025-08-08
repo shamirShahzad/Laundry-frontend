@@ -9,13 +9,21 @@ import {
 const BreadCrumbs = () => {
   const location = useLocation();
   const pathParts = location.pathname.split("/").filter(Boolean);
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   const breadCrumbs = pathParts.map((part, index) => {
     const href = "/" + pathParts.slice(0, index + 1).join("/");
-    const label = part.replace(/-/g, " ");
-    return {
-      href,
-      label: label.charAt(0).toUpperCase() + label.slice(1),
-    };
+    const cleanPart = decodeURIComponent(part.trim()); // handle encoded values like %20
+
+    const isNumber = !Number.isNaN(parseInt(cleanPart, 10));
+    const isUUID = uuidRegex.test(cleanPart);
+
+    const label =
+      isNumber || isUUID
+        ? "Details"
+        : cleanPart.charAt(0).toUpperCase() + cleanPart.slice(1);
+
+    return { href, label };
   });
 
   return (
@@ -26,11 +34,7 @@ const BreadCrumbs = () => {
             {index !== 0 && <BreadcrumbSeparator />}
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to={crumb.href}>
-                  {!Number.isNaN(parseInt(crumb.label))
-                    ? "Details"
-                    : crumb.label}
-                </Link>
+                <Link to={crumb.href}>{crumb.label}</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
           </div>

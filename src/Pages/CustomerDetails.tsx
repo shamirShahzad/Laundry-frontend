@@ -131,7 +131,6 @@ const CustomerDetails = () => {
   }, []);
 
   useEffect(() => {
-    console.log("CUSt", customer);
     if (customer.data.address.country) {
       const selectedCountry = countries.find(
         (c) => c.name === customer.data.address.country

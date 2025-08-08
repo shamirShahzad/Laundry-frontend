@@ -1,7 +1,6 @@
 "use client";
-import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,23 +9,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Checkbox } from "@/components/ui/checkbox";
+import { type ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-export type Customer = {
-  id: number;
+export type Service = {
+  id: string;
   name: string;
-  email: string;
-  phone: string;
-  address: {
-    country: string;
-    state: string;
-    city: string;
-    street: string;
-    building: string;
-  };
+  description: string;
 };
-export const customerColumns: ColumnDef<Customer>[] = [
+
+export const serviceColumns: ColumnDef<Service>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -49,13 +42,14 @@ export const customerColumns: ColumnDef<Customer>[] = [
     enableSorting: false,
     enableHiding: false,
   },
+
   {
     accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
           variant={"ghost"}
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          onClick={() => column.getIsSorted() === "asc"}
         >
           Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -64,45 +58,13 @@ export const customerColumns: ColumnDef<Customer>[] = [
     },
   },
   {
-    accessorKey: "email",
-    header: "Email",
-  },
-  {
-    accessorKey: "phone",
-    header: "Phone",
-  },
-  {
-    accessorKey: "address",
-    header: "Address (Country,State,City,Street,Building)",
-    cell: ({ row }) => {
-      const address = row.original.address;
-      const isEmptyAddress =
-        !address.country &&
-        !address.state &&
-        !address.city &&
-        !address.street &&
-        !address.building;
-      return (
-        <div className="flex gap-2">
-          {!isEmptyAddress ? (
-            <>
-              <p>{address.country ? address.country + "," : "N/A,"}</p>
-              <p>{address.state ? address.state + "," : "N/A,"}</p>
-              <p>{address.city ? address.city + "," : "N/A,"}</p>
-              <p>{address.street ? address.street + "," : "N/A,"}</p>
-              <p>{address.building ? address.building : "N/A"}</p>
-            </>
-          ) : (
-            <p className="text-muted-foreground">N/A</p>
-          )}
-        </div>
-      );
-    },
+    accessorKey: "description",
+    header: "Description",
   },
   {
     id: "actions",
     cell: function ActionCell({ row }) {
-      const customer = row.original;
+      const service = row.original;
       const navigate = useNavigate();
       return (
         <DropdownMenu>
@@ -116,16 +78,16 @@ export const customerColumns: ColumnDef<Customer>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() =>
-                navigator.clipboard.writeText(customer.id.toString())
+                navigator.clipboard.writeText(service.id.toString())
               }
             >
-              Copy customer Id
+              Copy service Id
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => navigate(`/customers/${customer.id}`)}
+              onClick={() => navigate(`/services/${service.id}`)}
             >
-              View Customer
+              View Service
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

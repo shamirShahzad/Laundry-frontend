@@ -14,6 +14,10 @@ import AddCustomer from "./Pages/AddCustomer";
 import CustomerDetails from "./Pages/CustomerDetails";
 import EditCustomer from "./Pages/EditCustomer";
 import AddItems from "./Pages/AddItems";
+import Services from "./Pages/Services";
+import AddServices from "./Pages/AddServices";
+import ServiceDetails from "./Pages/ServiceDetails";
+import EditService from "./Pages/EditServices";
 function App() {
   return (
     <>
@@ -33,6 +37,10 @@ function App() {
             <Route path="/customers/edit/:id" element={<EditCustomer />} />
             <Route path="/items" element={<Items />} />
             <Route path="/items/add" element={<AddItems />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/services/add" element={<AddServices />} />
+            <Route path="/services/:id" element={<ServiceDetails />} />
+            <Route path="/services/edit/:id" element={<EditService />} />
           </Route>
           <Route path="/about" element={<About />} />
         </Route>

@@ -8,7 +8,7 @@ import { useAlert } from "@/hooks/useAlert";
 import Sham_Alert from "@/Components/Sham_Alert";
 import Sham_LoadingOverlay from "@/Components/Sham_LoadingOverlay";
 import { DataTable } from "@/Tables/data-table";
-import { columns } from "@/Tables/Customers/customer-columns";
+import { customerColumns } from "@/Tables/Customers/customer-columns";
 import { FolderSearch } from "lucide-react";
 import "./colors.css";
 
@@ -58,7 +58,7 @@ const Customers = () => {
         <hr />
         <section>
           {customers.length > 0 ? (
-            <DataTable data={customers} columns={columns} />
+            <DataTable data={customers} columns={customerColumns} />
           ) : (
             <div className="w-full h-full bg-gray-100 flex flex-col justify-center items-center align-middle gap-10">
               <h1 className="text-9xl font-bold text-dark-blue">404</h1>

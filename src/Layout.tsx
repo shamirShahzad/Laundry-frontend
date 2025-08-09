@@ -25,7 +25,7 @@ export default function Layout() {
         <div className="flex items-center justify-center w-full h-12 border-b">
           <SidebarTrigger />
           <BreadCrumbs />
-          <div className="flex gap-2 mr-5">
+          <div className="flex gap-2 mr-5 mb-1">
             <Button variant="default" className="login" onClick={handleLogut}>
               Logout
             </Button>

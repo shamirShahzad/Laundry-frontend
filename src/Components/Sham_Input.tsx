@@ -13,6 +13,7 @@ const Sham_Input = ({
   divClassName,
   Label = null,
   LabelImportant = false,
+  containerClassName,
   ...props
 }: React.ComponentProps<"input"> & {
   Icon?: LucideIcon | null;
@@ -21,14 +22,17 @@ const Sham_Input = ({
   divClassName?: string;
   Label?: string | null;
   LabelImportant?: boolean;
+  containerClassName?: string;
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [field, meta] = useField(name);
   const hasIcon = Icon !== null ? true : false;
   const inputClass = `${hasIcon ? "shamInputIcon" : "shamInput"} ${className}`;
+  const fieldProps =
+    type === "file" ? { name: field.name, onBlur: field.onBlur } : field;
   return (
     <>
-      <div className="flex-col justify-start">
+      <div className={`flex-col justify-start ${containerClassName}`}>
         {Label && (
           <div
             className={`flex items-center gap-1 min-h-[32px] ${
@@ -55,7 +59,7 @@ const Sham_Input = ({
             type={showPassword && isPassword ? "text" : type}
             className={inputClass}
             {...props}
-            {...field}
+            {...fieldProps}
           >
             {children}
           </input>

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 interface PriceComponentProps {
   data: Service[];
   disabled?: boolean;
-  name: string; // e.g., "prices.0.serviceId"
+  name: string;
   Label: string;
   LabelImportant: boolean;
   InputLabel: string;
@@ -18,12 +18,12 @@ const PriceComponent: React.FC<PriceComponentProps> = ({
   LabelImportant,
   InputLabel,
 }) => {
-  const [serviceField, serviceMeta] = useField(`${name}.serviceId`); // serviceId field
+  const [serviceField, serviceMeta] = useField(`${name}.serviceName`); // serviceName field
   const [priceField, priceMeta] = useField(`${name}.price`);
   const navigate = useNavigate();
 
   return (
-    <div className="flex gap-30 items-center">
+    <div className={`flex gap-30 items-center ${disabled && "opacity-50"}`}>
       {/* Service Select */}
       <div className="flex-1">
         {Label && (
@@ -39,7 +39,7 @@ const PriceComponent: React.FC<PriceComponentProps> = ({
           {...serviceField}
           className={`bg-white rounded p-2 border border-gray-400 w-full ${
             serviceMeta.touched && serviceMeta.error ? "border-red-500" : ""
-          }`}
+          } `}
         >
           <option value="">Select a service</option>
           {data.length > 0 &&
@@ -70,7 +70,7 @@ const PriceComponent: React.FC<PriceComponentProps> = ({
         )}
         <input
           type="number"
-          disabled={serviceField.value === ""}
+          disabled={serviceField.value === "" || disabled}
           {...priceField}
           className="bg-white rounded p-1.5 border border-gray-400 w-full disabled:bg-gray-100"
         />

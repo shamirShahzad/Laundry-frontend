@@ -20,7 +20,9 @@ const Sham_TextArea = ({
 }) => {
   const [field, meta] = useField(name);
   const hasIcon = Icon !== null ? true : false;
-  const inputClass = `${hasIcon ? "shamInputIcon" : "shamInput"} ${className}`;
+  const inputClass = `${hasIcon ? "shamInputIcon" : "shamInput"} ${className} ${
+    props.disabled && "opacity-50"
+  }`;
   return (
     <>
       <div className="flex-col justify-start">
@@ -46,7 +48,12 @@ const Sham_TextArea = ({
           } ${divClassName}`}
         >
           {Icon && <Icon strokeWidth={0.75} className="mr-1" />}
-          <textarea className={inputClass} {...props} {...field}>
+          <textarea
+            className={inputClass}
+            {...props}
+            {...field}
+            disabled={props.disabled}
+          >
             {children}
           </textarea>
         </div>

@@ -1,9 +1,9 @@
-interface NewLoadingOverlayProps {
+interface Sham_LoadingOverlayProps {
   loading: boolean;
   children: React.ReactNode;
 }
 
-const Sham_LoadingOverlay: React.FC<NewLoadingOverlayProps> = ({
+const Sham_LoadingOverlay: React.FC<Sham_LoadingOverlayProps> = ({
   loading,
   children,
 }) => {

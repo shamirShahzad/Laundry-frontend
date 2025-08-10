@@ -5,14 +5,16 @@ import Sham_Input from "@/Components/Sham_Input";
 import Sham_LoadingOverlay from "@/Components/Sham_LoadingOverlay";
 import Sham_TextArea from "@/Components/Sham_TextArea";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 import { useAlert } from "@/hooks/useAlert";
 import { API } from "@/lib/utils/Axios";
-import type { ErrorResponse } from "@/lib/utils/Constants";
+import type { ErrorResponse, SuccessResponse } from "@/lib/utils/Constants";
 import type { Service } from "@/Tables/Services/services-columns";
 import type { AxiosError } from "axios";
 import { FieldArray, Form, Formik } from "formik";
-import { FileIcon, PlusCircleIcon, ShirtIcon } from "lucide-react";
+import { FileIcon, ShirtIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
 
 interface PriceEntry {
@@ -26,11 +28,15 @@ interface AddItemFormData {
   prices: PriceEntry[];
   image: File | null;
 }
-const AddItems = () => {
+const ItemDetails = () => {
   const MAX_FILE_SIZE = 5 * 1024 * 1024;
   const [loading, setLoading] = useState(false);
   const { alert, showAlert, hideAlert } = useAlert();
   const [services, setServices] = useState([] as Array<Service>);
+  const [item, setItem] = useState({} as SuccessResponse<AddItemFormData>);
+  const { id } = useParams();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const initialValues: AddItemFormData = {
     name: "",
@@ -63,6 +69,35 @@ const AddItems = () => {
       setLoading(false);
     }
   };
+
+  const getItem = async () => {
+    setLoading(true);
+    try {
+      const response = await API.get(`/items/?id=${id}`, {
+        withCredentials: true,
+      });
+      if (response.data.success) {
+        const retreivedItem: SuccessResponse<AddItemFormData> = response.data;
+        showAlert("success", response.data.message);
+        setItem(retreivedItem);
+      }
+    } catch (error) {
+      const err = error as AxiosError;
+      const errData = err?.response?.data as ErrorResponse;
+      showAlert(
+        "error",
+        errData?.message || err.message || "Something went wrong"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (services) {
+      getItem();
+    }
+  }, [services]);
 
   useEffect(() => {
     getServices();
@@ -97,39 +132,6 @@ const AddItems = () => {
       ),
   });
 
-  const handleSubmit = async (formData: AddItemFormData) => {
-    setLoading(true);
-    try {
-      const data = new FormData();
-      data.append("name", formData.name);
-      data.append("description", formData.description || "");
-      data.append("prices", JSON.stringify(formData.prices)); // stringified prices object
-      if (formData.image) {
-        data.append("image", formData.image); // only the file here
-      }
-
-      const response = await API.post("/items/create", data, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      if (response.data.success) {
-        showAlert("success", response.data.message);
-      }
-    } catch (error) {
-      const err = error as AxiosError;
-      const errData = err?.response?.data as ErrorResponse;
-      showAlert(
-        "error",
-        errData?.message || err?.message || "Something went wrong"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <Sham_LoadingOverlay loading={loading}>
       <div className="w-full h-full max-h-full bg-gray-200 overflow-auto">
@@ -139,17 +141,31 @@ const AddItems = () => {
           visible={alert.visible}
           onClose={hideAlert}
         />
-        <div className="ml-9">
+        <div className="flex items-center justify-between ml-9">
           <h1 className="mt-6 text-2xl font-semibold text-dark-blue">
-            Add Items
+            Item Details
           </h1>
+          {user?.role === "admin" && (
+            <div className="flex gap-3 items-center mr-5 mt-6">
+              <Button
+                variant={"ghost"}
+                className="border-1 border-gray-400 button-background-warning"
+                onClick={() => navigate(`/items/edit/${id}`)}
+              >
+                Edit
+              </Button>
+              <Button className="border-1 border-gray-400 button-background-destructive ">
+                Delete
+              </Button>
+            </div>
+          )}
         </div>
         <hr className="border-t border-gray-400 mt-3" />
         <Formik
-          initialValues={initialValues}
+          initialValues={item.data || initialValues}
           validationSchema={addItemSchema}
           onSubmit={(values) => {
-            handleSubmit(values);
+            console.log(values);
           }}
         >
           {({ handleChange, handleBlur, values }) => {
@@ -168,6 +184,7 @@ const AddItems = () => {
                     divClassName="border-1 border-gray-400"
                     containerClassName="flex-1"
                     Icon={ShirtIcon}
+                    disabled={true}
                   />
                   <Sham_Input
                     onBlur={handleBlur}
@@ -180,6 +197,7 @@ const AddItems = () => {
                     divClassName="border-1 border-gray-400"
                     containerClassName="flex-1"
                     Icon={FileIcon}
+                    disabled={true}
                   />
                 </div>
                 <div className="ml-9">
@@ -189,9 +207,9 @@ const AddItems = () => {
                 </div>
                 <hr className="border-t border-gray-400 mt-3" />
                 <FieldArray name="prices">
-                  {({ push, remove }) => (
+                  {() => (
                     <>
-                      {values.prices.map((_, index) => (
+                      {item?.data?.prices?.map((_, index) => (
                         <div key={index} className="mt-1 px-6 py-2 ml-3">
                           <PriceComponent
                             name={`prices.${index}`}
@@ -199,30 +217,10 @@ const AddItems = () => {
                             Label="Service"
                             LabelImportant={true}
                             InputLabel="Price"
+                            disabled={true}
                           />
-                          {values.prices.length > 1 && (
-                            <Button
-                              type="button"
-                              variant={"ghost"}
-                              className="mt-2 border border-red-500 hover:bg-red-600 hover:text-white"
-                              onClick={() => remove(index)}
-                            >
-                              Remove
-                            </Button>
-                          )}
                         </div>
                       ))}
-                      <div className="flex mt-4 pb-6 ml-9">
-                        <Button
-                          type="button"
-                          variant={"ghost"}
-                          className="border border-blue-600 hover:bg-blue-700 hover:text-white"
-                          onClick={() => push({ serviceName: "", price: 0 })}
-                        >
-                          <PlusCircleIcon size={18} />
-                          Add Service Prices
-                        </Button>
-                      </div>
                     </>
                   )}
                 </FieldArray>
@@ -238,10 +236,8 @@ const AddItems = () => {
                     rows={10}
                     className="resize-none"
                     divClassName="border-1 border-gray-400"
+                    disabled={true}
                   />
-                </div>
-                <div className="mt-1 px-6 pb-3 ml-3">
-                  <Button type="submit">Add Item</Button>
                 </div>
               </Form>
             );
@@ -252,4 +248,4 @@ const AddItems = () => {
   );
 };
 
-export default AddItems;
+export default ItemDetails;

@@ -1,6 +1,6 @@
 import { useAuth } from "@/context/AuthContext";
 import { Navigate, Outlet } from "react-router-dom";
-import LoadingOverlay from "./LoadingOverlay";
+import Sham_LoadingOverlay from "./Sham_LoadingOverlay";
 
 interface ProtectedRouteProps {
   allowedRoles?: string[];
@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 const ProtectedRoutes = ({ allowedRoles }: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
   if (loading)
-    return <LoadingOverlay loading={loading} children={<Outlet />} />;
+    return <Sham_LoadingOverlay loading={loading} children={<Outlet />} />;
   if (!user) {
     return <Navigate to="/" replace />;
   }

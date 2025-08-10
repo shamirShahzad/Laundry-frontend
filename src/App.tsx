@@ -18,6 +18,8 @@ import Services from "./Pages/Services";
 import AddServices from "./Pages/AddServices";
 import ServiceDetails from "./Pages/ServiceDetails";
 import EditService from "./Pages/EditServices";
+import ItemDetails from "./Pages/ItemDetails";
+import EditItems from "./Pages/EditItems";
 function App() {
   return (
     <>
@@ -35,8 +37,12 @@ function App() {
             <Route path="/customers/add" element={<AddCustomer />} />
             <Route path="/customers/:id" element={<CustomerDetails />} />
             <Route path="/customers/edit/:id" element={<EditCustomer />} />
+            //Item Routes
             <Route path="/items" element={<Items />} />
             <Route path="/items/add" element={<AddItems />} />
+            <Route path="/items/:id" element={<ItemDetails />} />
+            <Route path="/items/edit/:id" element={<EditItems />} />
+            //Services Routes
             <Route path="/services" element={<Services />} />
             <Route path="/services/add" element={<AddServices />} />
             <Route path="/services/:id" element={<ServiceDetails />} />

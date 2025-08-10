@@ -7,12 +7,13 @@ import Sham_TextArea from "@/Components/Sham_TextArea";
 import { Button } from "@/components/ui/button";
 import { useAlert } from "@/hooks/useAlert";
 import { API } from "@/lib/utils/Axios";
-import type { ErrorResponse } from "@/lib/utils/Constants";
+import type { ErrorResponse, SuccessResponse } from "@/lib/utils/Constants";
 import type { Service } from "@/Tables/Services/services-columns";
 import type { AxiosError } from "axios";
 import { FieldArray, Form, Formik } from "formik";
 import { FileIcon, PlusCircleIcon, ShirtIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
 
 interface PriceEntry {
@@ -20,19 +21,22 @@ interface PriceEntry {
   price: number;
 }
 
-interface AddItemFormData {
+interface EditItemFormData {
   name: string;
   description: string;
   prices: PriceEntry[];
   image: File | null;
 }
-const AddItems = () => {
+const EditItems = () => {
   const MAX_FILE_SIZE = 5 * 1024 * 1024;
   const [loading, setLoading] = useState(false);
   const { alert, showAlert, hideAlert } = useAlert();
   const [services, setServices] = useState([] as Array<Service>);
+  const [item, setItem] = useState({} as SuccessResponse<EditItemFormData>);
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  const initialValues: AddItemFormData = {
+  const initialValues: EditItemFormData = {
     name: "",
     description: "",
     prices: [
@@ -64,6 +68,35 @@ const AddItems = () => {
     }
   };
 
+  const getItem = async () => {
+    setLoading(true);
+    try {
+      const response = await API.get(`/items/?id=${id}`, {
+        withCredentials: true,
+      });
+      if (response.data.success) {
+        const retreivedItem: SuccessResponse<EditItemFormData> = response.data;
+        showAlert("success", response.data.message);
+        setItem(retreivedItem);
+      }
+    } catch (error) {
+      const err = error as AxiosError;
+      const errData = err?.response?.data as ErrorResponse;
+      showAlert(
+        "error",
+        errData?.message || err.message || "Something went wrong"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (services) {
+      getItem();
+    }
+  }, [services]);
+
   useEffect(() => {
     getServices();
   }, []);
@@ -83,21 +116,28 @@ const AddItems = () => {
       .min(1, "At least one price is required")
       .required(),
     image: Yup.mixed()
-      .required("Image is required")
+      .nullable()
       .test("fileType", "Unsupported file format", (value) => {
-        if (!value) return false;
+        if (!value) return true; // no file uploaded, allow it
+
+        if (typeof value === "string") {
+          // existing filename string, skip file validation
+          return true;
+        }
+
+        // else it's a File object, validate MIME type
         return ["image/jpeg", "image/png", "image/jpg", "image/pjpeg"].includes(
           (value as File).type
         );
       })
-      .test(
-        "fileSize",
-        "File too large, maximum 5MB allowed",
-        (value) => !value || (value as File).size <= MAX_FILE_SIZE
-      ),
+      .test("fileSize", "File too large, maximum 5MB allowed", (value) => {
+        if (!value) return true; // no file
+        if (typeof value === "string") return true; // existing image filename, skip size check
+        return (value as File).size <= MAX_FILE_SIZE;
+      }),
   });
 
-  const handleSubmit = async (formData: AddItemFormData) => {
+  const handleSubmit = async (formData: EditItemFormData) => {
     setLoading(true);
     try {
       const data = new FormData();
@@ -108,7 +148,7 @@ const AddItems = () => {
         data.append("image", formData.image); // only the file here
       }
 
-      const response = await API.post("/items/create", data, {
+      const response = await API.post(`/items/update/${id}`, data, {
         withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
@@ -127,6 +167,7 @@ const AddItems = () => {
       );
     } finally {
       setLoading(false);
+      navigate(`/items/${id}`);
     }
   };
 
@@ -141,12 +182,12 @@ const AddItems = () => {
         />
         <div className="ml-9">
           <h1 className="mt-6 text-2xl font-semibold text-dark-blue">
-            Add Items
+            Edit Item
           </h1>
         </div>
         <hr className="border-t border-gray-400 mt-3" />
         <Formik
-          initialValues={initialValues}
+          initialValues={item.data || initialValues}
           validationSchema={addItemSchema}
           onSubmit={(values) => {
             handleSubmit(values);
@@ -241,7 +282,7 @@ const AddItems = () => {
                   />
                 </div>
                 <div className="mt-1 px-6 pb-3 ml-3">
-                  <Button type="submit">Add Item</Button>
+                  <Button type="submit">Edit Item</Button>
                 </div>
               </Form>
             );
@@ -252,4 +293,4 @@ const AddItems = () => {
   );
 };
 
-export default AddItems;
+export default EditItems;

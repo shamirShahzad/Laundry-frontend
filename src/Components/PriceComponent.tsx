@@ -18,9 +18,23 @@ const PriceComponent: React.FC<PriceComponentProps> = ({
   LabelImportant,
   InputLabel,
 }) => {
-  const [serviceField, serviceMeta] = useField(`${name}.serviceName`); // serviceName field
+  const [serviceField, serviceMeta, serviceHelpers] = useField(
+    `${name}.serviceName`
+  ); // serviceName field
   const [priceField, priceMeta] = useField(`${name}.price`);
+  const [serviceIdField, , serviceIdhelpers] = useField(`${name}.serviceId`);
   const navigate = useNavigate();
+
+  const handleServiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedName = e.target.value;
+    serviceHelpers.setValue(selectedName);
+    const selectedService = data.find(
+      (service) => service.name === selectedName
+    );
+    if (selectedService) {
+      serviceIdhelpers.setValue(selectedService.id);
+    }
+  };
 
   return (
     <div className={`flex gap-30 items-center ${disabled && "opacity-50"}`}>
@@ -36,7 +50,10 @@ const PriceComponent: React.FC<PriceComponentProps> = ({
         )}
         <select
           disabled={disabled}
-          {...serviceField}
+          onChange={handleServiceChange}
+          name={serviceField.name}
+          onBlur={serviceField.onBlur}
+          value={serviceField.value}
           className={`bg-white rounded p-2 border border-gray-400 w-full ${
             serviceMeta.touched && serviceMeta.error ? "border-red-500" : ""
           } `}
@@ -56,6 +73,7 @@ const PriceComponent: React.FC<PriceComponentProps> = ({
         {serviceMeta.touched && serviceMeta.error && (
           <div className="text-red-600 text-xs mb-1">{serviceMeta.error}</div>
         )}
+        <input type="hidden" {...serviceIdField} />
       </div>
 
       {/* Price Input */}

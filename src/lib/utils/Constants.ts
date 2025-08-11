@@ -1,5 +1,6 @@
 export const baseUrl = import.meta.env.VITE_API_URL;
 export const productsUrl = import.meta.env.VITE_BASE_URL;
+export const priceSymbol = "KWD";
 
 export interface ErrorResponse {
   status: number;

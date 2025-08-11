@@ -1,13 +1,14 @@
 import "./AppSidebar.css";
 import {
   Home,
-  Settings,
   UserRoundPlus,
   UserRound,
   ClipboardPlusIcon,
   ClipboardIcon,
   Package2Icon,
   PackagePlus,
+  TicketCheckIcon,
+  TicketPlusIcon,
 } from "lucide-react";
 // import useSidebar from "@/components/ui/sidebar";
 import {
@@ -61,10 +62,16 @@ const items = [
     ],
   },
   {
-    title: "Settings",
-    url: "#",
-    Icon: Settings,
-    items: [],
+    title: "Orders",
+    url: "/orders",
+    Icon: TicketCheckIcon,
+    items: [
+      {
+        title: "Add Order",
+        url: "/orders/add",
+        Icon: TicketPlusIcon,
+      },
+    ],
   },
 ];
 

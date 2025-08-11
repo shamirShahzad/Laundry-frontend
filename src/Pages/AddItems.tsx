@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import * as Yup from "yup";
 
 interface PriceEntry {
+  serviceId: string;
   serviceName: string;
   price: number;
 }
@@ -37,6 +38,7 @@ const AddItems = () => {
     description: "",
     prices: [
       {
+        serviceId: "",
         serviceName: "",
         price: 0,
       },

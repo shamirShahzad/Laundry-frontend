@@ -20,6 +20,8 @@ import ServiceDetails from "./Pages/ServiceDetails";
 import EditService from "./Pages/EditServices";
 import ItemDetails from "./Pages/ItemDetails";
 import EditItems from "./Pages/EditItems";
+import AddOrder from "./Pages/AddOrder";
+import Orders from "./Pages/Orders";
 function App() {
   return (
     <>
@@ -30,7 +32,7 @@ function App() {
           <Route path="/unauthorized" element={<Unauthorized />} />
         </Route>
         <Route element={<Layout />}>
-          <Route element={<ProtectedRoutes />}>
+          <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
             <Route path="/dashboard" element={<Dashboard />} />
             //Customers routes
             <Route path="/customers" element={<Customers />} />
@@ -47,6 +49,10 @@ function App() {
             <Route path="/services/add" element={<AddServices />} />
             <Route path="/services/:id" element={<ServiceDetails />} />
             <Route path="/services/edit/:id" element={<EditService />} />
+          </Route>
+          <Route element={<ProtectedRoutes allowedRoles={["admin", "user"]} />}>
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/orders/add" element={<AddOrder />} />
           </Route>
           <Route path="/about" element={<About />} />
         </Route>

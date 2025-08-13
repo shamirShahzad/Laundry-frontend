@@ -2,42 +2,57 @@
 import Sham_Alert from "@/Components/Sham_Alert";
 import Sham_Input from "@/Components/Sham_Input";
 import Sham_LoadingOverlay from "@/Components/Sham_LoadingOverlay";
+import Sham_TextArea from "@/Components/Sham_TextArea";
+import { Button } from "@/components/ui/button";
 import { useAlert } from "@/hooks/useAlert";
 import { API } from "@/lib/utils/Axios";
+import "./colors.css";
 import {
   priceSymbol,
   productsUrl,
   type ErrorResponse,
 } from "@/lib/utils/Constants";
+import type { Customer } from "@/Tables/Customers/customer-columns";
 import type { Item } from "@/Tables/Items/item-columns";
 import type { AxiosError } from "axios";
 import { Form, Formik } from "formik";
-import { SearchIcon } from "lucide-react";
+import { BanknoteIcon, PlusCircleIcon, SearchIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AddOrder = () => {
   interface OrderLine {
     item_id: string;
     service_ids: string[];
     quantity: number;
+    amount: number;
   }
 
   interface FormData {
     search: string;
-    cust_id: string;
+    cust_id: number | undefined;
     items: OrderLine[];
+    notes: string;
+    paid_amount: string;
+    total: number;
   }
 
   const initialValues: FormData = {
     search: "",
-    cust_id: "",
+    cust_id: undefined,
     items: [],
+    paid_amount: "",
+    total: 0,
+    notes: "",
   };
 
   const [loading, setLoading] = useState(false);
   const { alert, showAlert, hideAlert } = useAlert();
 
   const [items, setItems] = useState([] as Array<Item>);
+  const [customers, setCustomers] = useState([] as Array<Customer>);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const navigate = useNavigate();
 
   const getItems = async () => {
     setLoading(true);
@@ -58,9 +73,53 @@ const AddOrder = () => {
     }
   };
 
+  const getCustomers = async () => {
+    setLoading(true);
+    try {
+      const response = await API.get("/customers");
+      if (response.data.success) {
+        setCustomers(response.data.data);
+      }
+    } catch (error) {
+      const err = error as AxiosError;
+      const errData = err?.response?.data as ErrorResponse;
+      showAlert(
+        "error",
+        errData?.message || err.message || "Something went wrong"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     getItems();
+    getCustomers();
   }, []);
+
+  const handleSubmit = async (formData: FormData, resetForm: () => void) => {
+    setLoading(true);
+    try {
+      //Make cust_id to a number from string
+      formData.cust_id = Number(formData.cust_id);
+      const response = await API.post("/orders/create", formData, {
+        withCredentials: true,
+      });
+      if (response.data.success) {
+        showAlert("success", response.data.message);
+        resetForm();
+      }
+    } catch (error) {
+      const err = error as AxiosError;
+      const errData = err?.response?.data as ErrorResponse;
+      showAlert(
+        "error",
+        errData?.message || err?.message || "Something went wrong"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Sham_LoadingOverlay loading={loading}>
@@ -79,7 +138,9 @@ const AddOrder = () => {
         <hr className="border-t border-gray-400 mt-3" />
         <Formik
           initialValues={initialValues}
-          onSubmit={() => {}}
+          onSubmit={(values, { resetForm }) => {
+            handleSubmit(values, resetForm);
+          }}
           validationSchema={null}
         >
           {({ handleBlur, handleChange, values, setFieldValue }) => {
@@ -90,6 +151,7 @@ const AddOrder = () => {
                   item_id,
                   service_ids: [],
                   quantity: 1,
+                  amount: 0,
                 },
               ]);
             };
@@ -97,6 +159,28 @@ const AddOrder = () => {
             const updateQty = (lineIndex: number, quantity: number) => {
               const updated = [...values.items];
               updated[lineIndex].quantity = quantity;
+
+              if (updated[lineIndex].service_ids.length > 0) {
+                const item = items.find(
+                  (i) => i.id === updated[lineIndex].item_id
+                );
+
+                if (item && quantity > 0) {
+                  const totalPrice = item.prices
+                    .filter((p) =>
+                      updated[lineIndex].service_ids.includes(p.serviceId)
+                    )
+                    .reduce((sum, p) => sum + p.price, 0);
+                  updated[lineIndex].amount = totalPrice * quantity;
+                } else {
+                  updated[lineIndex].amount = 0;
+                }
+              } else {
+                updated[lineIndex].amount = 0;
+              }
+              const total = updated.reduce((sum, line) => sum + line.amount, 0);
+              setFieldValue("total", total);
+              setTotalAmount(total);
               setFieldValue("items", updated);
             };
 
@@ -113,6 +197,26 @@ const AddOrder = () => {
               updated[lineIndex].service_ids = services.includes(service_id)
                 ? services.filter((id) => id !== service_id)
                 : [...services, service_id];
+
+              if (updated[lineIndex].service_ids.length > 0) {
+                const item = items.find(
+                  (i) => i.id === updated[lineIndex].item_id
+                );
+                if (item && updated[lineIndex].quantity > 0) {
+                  const totalPrice = item.prices
+                    .filter((p) =>
+                      updated[lineIndex].service_ids.includes(p.serviceId)
+                    )
+                    .reduce((sum, p) => sum + p.price, 0);
+                  updated[lineIndex].amount =
+                    totalPrice * updated[lineIndex].quantity;
+                } else {
+                  updated[lineIndex].amount = 0;
+                }
+              }
+              const total = updated.reduce((sum, line) => sum + line.amount, 0);
+              setFieldValue("total", total);
+              setTotalAmount(total);
               setFieldValue("items", updated);
             };
             console.log(values);
@@ -132,6 +236,43 @@ const AddOrder = () => {
                     name="search"
                     divClassName="border-1 border-gray-400"
                   />
+                  <div className="flex justify-stretch  items-center w-full">
+                    <div className="flex-1">
+                      <label htmlFor="cust_id">
+                        Customer{" "}
+                        <span className="text-red-600 text-3xl border-box leading-none">
+                          *
+                        </span>
+                      </label>
+                      <select
+                        id="cust_id"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        name="cust_id"
+                        className="w-full border-1 border-gray-400 bg-white p-2 rounded mt-2"
+                      >
+                        <option value="">Select Customer</option>
+                        {customers.length > 0 &&
+                          customers.map((customer, index) => (
+                            <option key={index} value={customer.id}>
+                              {customer.name}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                    <Button
+                      type="button"
+                      variant={"ghost"}
+                      onClick={() => {
+                        navigate("/customers/add");
+                      }}
+                      className="ml-2 border border-blue-700 hover:bg-blue-700 hover:text-white flex gap-2 mt-10 flex-0.5"
+                    >
+                      Add Customer
+                      <PlusCircleIcon className="w-4 h-4" />
+                    </Button>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-6">
                     {filteredItems.length > 0 ? (
                       filteredItems.map((item) => (
@@ -221,10 +362,58 @@ const AddOrder = () => {
                       })}
                     </div>
                   )}
+                  <div className="flex gap-10 justify-start items-center">
+                    <Sham_Input
+                      name="paid_amount"
+                      Label={"Paid Amount"}
+                      LabelImportant={true}
+                      type="number"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      Icon={BanknoteIcon}
+                      divClassName="border-1 border-gray-400"
+                      onKeyDown={(e) => {
+                        const allowedKeys = [
+                          "Backspace",
+                          "Delete",
+                          "ArrowLeft",
+                          "ArrowRight",
+                          "Tab",
+                        ];
+
+                        // Allow control keys
+                        if (allowedKeys.includes(e.key)) return;
+
+                        // Allow only one decimal point
+                        if (e.key === ".") {
+                          if (values.paid_amount.includes(".")) {
+                            e.preventDefault();
+                          }
+                          return;
+                        }
+
+                        // Block anything that's not a digit
+                        if (!/^[0-9]$/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+                    <div className="text-2xl font-bold w-1/2 text-dark-blue">{`Total Amount: ${priceSymbol} ${totalAmount}`}</div>
+                  </div>
+                  <Sham_TextArea
+                    name="notes"
+                    Label={"Notes"}
+                    LabelImportant={false}
+                    rows={5}
+                    className="resize-none"
+                    divClassName="border-1 border-gray-400"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
                 </div>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg ml-6"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg ml-6 mb-2"
                 >
                   Place Order
                 </button>

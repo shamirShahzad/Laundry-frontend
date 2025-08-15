@@ -120,7 +120,6 @@ const AddCustomer = () => {
             const customHandleChange = (
               e: React.ChangeEvent<HTMLSelectElement>
             ) => {
-              console.log(e.target);
               const { name } = e.target;
               if (name === "address.country") {
                 const country = countries.find(
@@ -128,7 +127,6 @@ const AddCustomer = () => {
                 ) as ICountry;
                 const getStates = State.getStatesOfCountry(country.isoCode);
                 if (getStates.length <= 0) {
-                  console.log("CITY", City.getCitiesOfCountry(country.isoCode));
                   setCities(City.getCitiesOfCountry(country.isoCode));
                 }
                 setStates(getStates);

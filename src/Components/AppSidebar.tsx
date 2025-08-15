@@ -78,7 +78,7 @@ const items = [
 export function AppSidebar() {
   const location = useLocation();
   return (
-    <Sidebar>
+    <Sidebar className="z-50">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Laundry</SidebarGroupLabel>

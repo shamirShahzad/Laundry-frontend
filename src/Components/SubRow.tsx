@@ -4,9 +4,10 @@ import "../../src/Pages/colors.css";
 
 interface SubRowProps {
   item: ItemsArray;
+  notes: string;
 }
 
-const SubRow: React.FC<SubRowProps> = ({ item }) => {
+const SubRow: React.FC<SubRowProps> = ({ item, notes }) => {
   return (
     <div className="p-2 flex gap-10 items-center border-b">
       <img
@@ -39,6 +40,12 @@ const SubRow: React.FC<SubRowProps> = ({ item }) => {
           ))}
         </div>
       </div>
+      {notes !== "" && (
+        <div className="flex-col items-cent justify-center ">
+          <p className="font-medium text-lg text-dark-blue">Notes</p>
+          <p className="text-dark-blue text-base">{notes}</p>
+        </div>
+      )}
     </div>
   );
 };

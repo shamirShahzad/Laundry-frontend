@@ -219,7 +219,6 @@ const AddOrder = () => {
               setTotalAmount(total);
               setFieldValue("items", updated);
             };
-            console.log(values);
             const filteredItems = items.filter((item) =>
               item.name.toLowerCase().includes(values.search.toLowerCase())
             );

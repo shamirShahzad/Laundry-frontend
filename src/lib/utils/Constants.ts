@@ -16,3 +16,16 @@ export interface SuccessResponse<T = object> {
   message: string;
   data: T;
 }
+
+export const Status = {
+  PENDING: "pending",
+  COMPLETED: "completed",
+  CANCELLED: "cancelled",
+};
+
+export const PaymentStatus = {
+  PAID: "paid",
+  PARTIAL: "partial",
+  UNPAID: "unpaid",
+  REFUNDED: "refunded",
+};

@@ -164,9 +164,7 @@ const ItemDetails = () => {
         <Formik
           initialValues={item.data || initialValues}
           validationSchema={addItemSchema}
-          onSubmit={(values) => {
-            console.log(values);
-          }}
+          onSubmit={() => {}}
         >
           {({ handleChange, handleBlur, values }) => {
             return (

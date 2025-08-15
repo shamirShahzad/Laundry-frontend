@@ -52,7 +52,6 @@ const AddItems = () => {
       const response = await API.get("/services", { withCredentials: true });
       if (response.data.success) {
         setServices(response.data.data);
-        showAlert("success", response.data.message);
       }
     } catch (error) {
       const err = error as AxiosError;

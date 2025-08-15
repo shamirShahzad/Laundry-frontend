@@ -34,12 +34,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   expandable?: boolean;
+  drawer?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   expandable,
+  drawer,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -78,15 +80,16 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4 ml-2">
+      <div className="flex items-center py-4 ml-2 gap-10">
         <Input
           placeholder="Filter name..."
           value={(filterCol?.getFilterValue() as string) ?? ""}
           onChange={(event) => filterCol?.setFilterValue(event.target.value)}
           className="max-w-sm"
         />
+        {drawer}
       </div>
-      <div className="overflow-hidden border-t-0">
+      <div className="overflow-scroll border-t-0">
         <Table containerClassName="myTable">
           <TableHeader
             className={`sticky top-0 z-10 bg-white transition-shadow duration-300 boxShadow `}
@@ -111,6 +114,8 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => {
+                const notes: string = row.getValue("notes") as string;
+                console.log("ROW", row.original);
                 let items: ItemsArray[] = [];
                 if (expandable) {
                   items = row.getValue("items") as ItemsArray[];
@@ -145,7 +150,13 @@ export function DataTable<TData, TValue>({
                               style={{ overflow: "hidden" }}
                             >
                               {items.map((items, index) => {
-                                return <SubRow key={index} item={items} />;
+                                return (
+                                  <SubRow
+                                    key={index}
+                                    item={items}
+                                    notes={notes}
+                                  />
+                                );
                               })}
                             </motion.div>
                           </TableCell>

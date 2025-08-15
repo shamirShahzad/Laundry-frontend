@@ -28,6 +28,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+//TODO :GET FROM API / MAKE THE API FOR IT
 const chartData = [
   { date: "2024-04-01", order: 222 },
   { date: "2024-04-02", order: 97 },

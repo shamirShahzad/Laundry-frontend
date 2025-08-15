@@ -33,12 +33,6 @@ function App() {
         </Route>
         <Route element={<Layout />}>
           <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            //Customers routes
-            <Route path="/customers" element={<Customers />} />
-            <Route path="/customers/add" element={<AddCustomer />} />
-            <Route path="/customers/:id" element={<CustomerDetails />} />
-            <Route path="/customers/edit/:id" element={<EditCustomer />} />
             //Item Routes
             <Route path="/items" element={<Items />} />
             <Route path="/items/add" element={<AddItems />} />
@@ -51,8 +45,16 @@ function App() {
             <Route path="/services/edit/:id" element={<EditService />} />
           </Route>
           <Route element={<ProtectedRoutes allowedRoles={["admin", "user"]} />}>
+            //Dashboard
+            <Route path="/dashboard" element={<Dashboard />} />
+            //Orders
             <Route path="/orders" element={<Orders />} />
             <Route path="/orders/add" element={<AddOrder />} />
+            //Customers routes
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/customers/add" element={<AddCustomer />} />
+            <Route path="/customers/:id" element={<CustomerDetails />} />
+            <Route path="/customers/edit/:id" element={<EditCustomer />} />
           </Route>
           <Route path="/about" element={<About />} />
         </Route>

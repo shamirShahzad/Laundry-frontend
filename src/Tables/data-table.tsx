@@ -149,15 +149,31 @@ export function DataTable<TData, TValue>({
                               transition={{ duration: 0.3, ease: "easeInOut" }}
                               style={{ overflow: "hidden" }}
                             >
-                              {items.map((items, index) => {
-                                return (
-                                  <SubRow
-                                    key={index}
-                                    item={items}
-                                    notes={notes}
-                                  />
-                                );
-                              })}
+                              {notes !== "" ? (
+                                <div className="flex gap-5">
+                                  <div className="flex-col items-center w-[70%]">
+                                    {items.map((items, index) => {
+                                      return (
+                                        <SubRow key={index} item={items} />
+                                      );
+                                    })}
+                                  </div>
+                                  <div className="flex-col  w-[30%] ">
+                                    <p className="font-medium text-lg text-dark-blue">
+                                      Notes
+                                    </p>
+                                    <p className="text-dark-blue text-base">
+                                      {notes}
+                                    </p>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  {items.map((items, index) => {
+                                    return <SubRow key={index} item={items} />;
+                                  })}
+                                </>
+                              )}
                             </motion.div>
                           </TableCell>
                         </TableRow>

@@ -19,6 +19,7 @@ import { Form, Formik } from "formik";
 import { BanknoteIcon, PlusCircleIcon, SearchIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import * as Yup from "yup";
 
 const AddOrder = () => {
   interface OrderLine {
@@ -121,6 +122,45 @@ const AddOrder = () => {
     }
   };
 
+  const AddOrderSchema = Yup.object({
+    search: Yup.string().optional(),
+
+    cust_id: Yup.number()
+      .typeError("Customer is required")
+      .required("Customer is required"),
+
+    items: Yup.array()
+      .of(
+        Yup.object({
+          item_id: Yup.string().required("Item is required"),
+          service_ids: Yup.array()
+            .of(Yup.string())
+            .min(1, "At least one service must be selected"),
+          quantity: Yup.number()
+            .typeError("Quantity must be a number")
+            .min(1, "Quantity must be at least 1")
+            .required("Quantity is required"),
+          amount: Yup.number()
+            .typeError("Amount must be a number")
+            .min(0, "Amount cannot be negative")
+            .required("Amount is required"),
+        })
+      )
+      .min(1, "At least one item must be added")
+      .required("Items are required"),
+
+    notes: Yup.string().optional(),
+
+    paid_amount: Yup.string()
+      .required("Paid amount is required")
+      .matches(/^\d+(\.\d{1,2})?$/, "Invalid amount format"),
+
+    total: Yup.number()
+      .typeError("Total must be a number")
+      .min(0, "Total cannot be negative")
+      .required("Total is required"),
+  });
+
   return (
     <Sham_LoadingOverlay loading={loading}>
       <div className="w-full h-full max-h-full bg-gray-200 overflow-auto">
@@ -141,7 +181,7 @@ const AddOrder = () => {
           onSubmit={(values, { resetForm }) => {
             handleSubmit(values, resetForm);
           }}
-          validationSchema={null}
+          validationSchema={AddOrderSchema}
         >
           {({ handleBlur, handleChange, values, setFieldValue }) => {
             const addOrderLine = (item_id: string) => {

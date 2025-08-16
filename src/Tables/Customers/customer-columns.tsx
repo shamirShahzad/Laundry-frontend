@@ -13,18 +13,20 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { useNavigate } from "react-router-dom";
 
+export interface Address {
+  country: string;
+  state: string;
+  city: string;
+  street: string;
+  building: string;
+}
+
 export type Customer = {
   id: number;
   name: string;
   email: string;
   phone: string;
-  address: {
-    country: string;
-    state: string;
-    city: string;
-    street: string;
-    building: string;
-  };
+  address: Address;
 };
 export const customerColumns: ColumnDef<Customer>[] = [
   {

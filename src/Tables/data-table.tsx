@@ -115,7 +115,6 @@ export function DataTable<TData, TValue>({
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => {
                 const notes: string = row.getValue("notes") as string;
-                console.log("ROW", row.original);
                 let items: ItemsArray[] = [];
                 if (expandable) {
                   items = row.getValue("items") as ItemsArray[];
